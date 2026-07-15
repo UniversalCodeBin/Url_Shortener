@@ -27,6 +27,16 @@ async def get_urls(
     return await service.get_urls(skip=skip, limit=limit)
 
 
+@router.get("/search", response_model=list[URLResponse])
+async def search_urls(
+    q: str = Query(..., min_length=1, description="Search query for URLs or codes"),
+    limit: int = Query(20, ge=1, le=100),
+    db: AsyncSession = Depends(get_db),
+) -> list[URLResponse]:
+    service = URLService(db)
+    return await service.search_urls(q, limit)
+
+
 @router.get("/{url_id}", response_model=URLResponse)
 async def get_url(
     url_id: UUID,

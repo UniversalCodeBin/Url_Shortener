@@ -3,7 +3,10 @@ from typing import Optional
 from uuid import UUID
 from fastapi import Request
 from sqlalchemy.ext.asyncio import AsyncSession
+from app.config import get_settings
 from app.repositories.analytics_repository import AnalyticsRepository
+
+settings = get_settings()
 
 
 class AnalyticsService:
@@ -56,4 +59,11 @@ class AnalyticsService:
         }
 
     async def get_top_urls(self, limit: int = 10) -> list[dict]:
-        return await self.repository.get_top_urls(limit)
+        urls = await self.repository.get_top_urls(limit)
+        return [
+            {
+                **url,
+                "short_url": f"{settings.BASE_URL}/{url['short_code']}",
+            }
+            for url in urls
+        ]

@@ -1,6 +1,6 @@
 from typing import Optional
 from uuid import UUID
-from sqlalchemy import select, update, delete, func
+from sqlalchemy import select, update, delete, func, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.url import URL
 from app.schemas.url import URLCreate
@@ -64,6 +64,22 @@ class URLRepository:
     async def get_urls(self, skip: int = 0, limit: int = 100) -> list[URL]:
         result = await self.db.execute(
             select(URL).offset(skip).limit(limit).order_by(URL.created_at.desc())
+        )
+        return list(result.scalars().all())
+
+    async def search_urls(self, query: str, limit: int = 20) -> list[URL]:
+        pattern = f"%{query}%"
+        result = await self.db.execute(
+            select(URL)
+            .where(
+                or_(
+                    URL.short_code.ilike(pattern),
+                    URL.original_url.ilike(pattern),
+                ),
+                URL.is_active == True,
+            )
+            .order_by(URL.created_at.desc())
+            .limit(limit)
         )
         return list(result.scalars().all())
 

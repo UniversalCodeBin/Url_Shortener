@@ -14,7 +14,7 @@ settings = get_settings()
 class URLService:
     def __init__(self, db: AsyncSession):
         self.repository = URLRepository(db)
-        self.base_url = f"http://localhost:8000{settings.API_V1_PREFIX}"
+        self.base_url = settings.BASE_URL
 
     async def create_url(self, url_data: URLCreate) -> URLResponse:
         if url_data.custom_code:
@@ -95,6 +95,10 @@ class URLService:
             "clicks": url.clicks,
             "created_at": url.created_at,
         }
+
+    async def search_urls(self, query: str, limit: int = 20) -> list[URLResponse]:
+        urls = await self.repository.search_urls(query, limit)
+        return [self._to_response(url) for url in urls]
 
     async def _generate_unique_code(self) -> str:
         for _ in range(10):

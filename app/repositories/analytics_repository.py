@@ -74,16 +74,18 @@ class AnalyticsRepository:
                 URL.short_code,
                 func.count(ClickEvent.id).label("click_count"),
             )
-            .join(ClickEvent, URL.id == ClickEvent.url_id)
+            .outerjoin(ClickEvent, URL.id == ClickEvent.url_id)
             .group_by(URL.id, URL.original_url, URL.short_code)
             .order_by(func.count(ClickEvent.id).desc())
             .limit(limit)
         )
+        base_url = ""  # will be filled server-side if needed
         return [
             {
                 "id": row.id,
                 "original_url": row.original_url,
                 "short_code": row.short_code,
+                "short_url": f"{base_url}/{row.short_code}",
                 "click_count": row.click_count,
             }
             for row in result.all()
