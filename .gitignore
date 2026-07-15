@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Docker
+docker/data/
+
+# Alembic
+alembic/versions/*.py
+
+# pytest
+.coverage
+htmlcov/
+.pytest_cache/
+
+# mypy
+.mypy_cache/
